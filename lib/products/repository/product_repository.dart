@@ -1,3 +1,4 @@
+import 'package:flutter/services.dart';
 import 'package:products/entities/api_response.dart';
 import 'package:products/entities/category.dart';
 import 'package:products/entities/product.dart';
@@ -11,25 +12,20 @@ class ProductRepository implements ProductRepositoryIml {
 
   @override
   Future<ApiResponse> getProducts(List<CategoryModel> categories) async {
-    print('aca');
-
     final response = await _apiBaseHelper.getHttp('productos');
 
     if (response.data != null && response.status == 200) {
       response.data =
           (response.data as List).map((i) => ProductModel.fromJson(i)).toList();
-      print('Antes del map');
 
       response.data.map((ProductModel product) {
-        print('dentro del map');
         final category = categories
             .firstWhere((element) => element.id == product.idCategoria)
             .nombre;
-        print(category);
+
         product.setCategory = category;
       }).toList();
-      print('despues del map');
-      print(response.data);
+
       return response;
     }
     return response;
@@ -46,6 +42,19 @@ class ProductRepository implements ProductRepositoryIml {
 
       return response;
     }
+    return response;
+  }
+
+  @override
+  Future<ApiResponse> deleteProduct(int id) async {
+    final response = await _apiBaseHelper.deleteHttp('productos/$id');
+
+    if (response.data != null && response.status == 200) {
+      response.data = true;
+      print('elimino');
+      return response;
+    }
+    response.data = false;
     return response;
   }
 }

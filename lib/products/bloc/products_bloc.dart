@@ -13,6 +13,7 @@ class ProductsBloc extends Bloc<ProductsEvent, ProductsState> {
   List<CategoryModel>? categories;
   ProductsBloc(this._productRepositoryIml) : super(ProductsState()) {
     on<GetProducts>(_onGetProducts);
+    on<DeleteProduct>(_onDeleteProduct);
   }
 
   Future<void> _onGetProducts(
@@ -23,6 +24,7 @@ class ProductsBloc extends Bloc<ProductsEvent, ProductsState> {
 
       if (apiResultCategories.data != null) {
         categories = apiResultCategories.data;
+
         final apiResult = await _productRepositoryIml.getProducts(categories!);
         if (apiResult.data != null) {
           emit(state.copyWith(
@@ -39,6 +41,27 @@ class ProductsBloc extends Bloc<ProductsEvent, ProductsState> {
         emit(state.copyWith(
           status: ProductStatus.error,
           errorMessage: apiResultCategories.message,
+        ));
+      }
+    } catch (e) {
+      emit(state.copyWith(
+        status: ProductStatus.error,
+        errorMessage: e.toString(),
+      ));
+    }
+  }
+
+  Future<void> _onDeleteProduct(
+      DeleteProduct event, Emitter<ProductsState> emit) async {
+    emit(state.copyWith(status: ProductStatus.loading));
+    try {
+      final apiResult = await _productRepositoryIml.deleteProduct(event.id);
+      if (apiResult.data != null) {
+        add(GetProducts());
+      } else {
+        emit(state.copyWith(
+          status: ProductStatus.error,
+          errorMessage: apiResult.message,
         ));
       }
     } catch (e) {

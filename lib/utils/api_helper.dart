@@ -44,6 +44,19 @@ class ApiBaseHelper {
     return apiResponse;
   }
 
+  Future<ApiResponse> deleteHttp(String url) async {
+    ApiResponse apiResponse = ApiResponse(message: '', data: null, status: 200);
+    try {
+      Response response = await dio.delete(url);
+      apiResponse.data = response.data;
+      apiResponse.status = response.statusCode!;
+      return apiResponse;
+    } catch (e) {
+      apiResponse = _getDioError(e);
+    }
+    return apiResponse;
+  }
+
   ApiResponse _getDioError(e) {
     ApiResponse apiResponse = ApiResponse(message: '', data: null, status: 200);
     if (e is Exception) {

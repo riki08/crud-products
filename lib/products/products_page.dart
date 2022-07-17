@@ -71,6 +71,7 @@ class ProductDetail extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final ProductsBloc _productBloc = BlocProvider.of<ProductsBloc>(context);
     return Dismissible(
       key: ValueKey(product.id),
       background: Container(
@@ -114,6 +115,7 @@ class ProductDetail extends StatelessWidget {
       onDismissed: (direction) {
         if (direction == DismissDirection.endToStart) {
           print('end to star');
+          _productBloc.add(DeleteProduct(product.id));
         }
         if (direction == DismissDirection.startToEnd) {
           print('star to end');
