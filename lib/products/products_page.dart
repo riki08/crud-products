@@ -29,10 +29,20 @@ class _ProductsPageState extends State<ProductsPage> {
     ResponsiveUtil.setScreenSize(size);
     return Scaffold(
         appBar: AppBar(
-            title: Text(
-          'Products',
-          style: TextStyle(fontSize: 6.w),
-        )),
+          title: Text(
+            'Products',
+            style: TextStyle(fontSize: 6.w),
+          ),
+          actions: [
+            IconButton(
+                onPressed: () => Navigator.of(context).pushNamed('form'),
+                icon: Icon(
+                  Icons.add_circle,
+                  color: Colors.white,
+                  size: 4.h,
+                ))
+          ],
+        ),
         body: BlocBuilder<ProductsBloc, ProductsState>(
           builder: (context, state) {
             if (state.status.isLoading) {
@@ -114,7 +124,6 @@ class ProductDetail extends StatelessWidget {
       ),
       onDismissed: (direction) {
         if (direction == DismissDirection.endToStart) {
-          print('end to star');
           _productBloc.add(DeleteProduct(product.id));
         }
         if (direction == DismissDirection.startToEnd) {

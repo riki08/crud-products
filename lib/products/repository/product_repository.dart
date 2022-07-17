@@ -51,10 +51,31 @@ class ProductRepository implements ProductRepositoryIml {
 
     if (response.data != null && response.status == 200) {
       response.data = true;
-      print('elimino');
       return response;
     }
     response.data = false;
+    return response;
+  }
+
+  @override
+  Future<ApiResponse> addProduct(String name, String description, String price,
+      String code, String state, int category) async {
+    final response = await _apiBaseHelper.postHttp('productos', {
+      "codigo": code,
+      "estado": state == 'true' ? true : false,
+      "precio": price,
+      "producto": name,
+      "descripcion": description,
+      "idCategoria": category
+    });
+
+    if (response.data != null && response.status == 200) {
+      response.data = (response.data as List)
+          .map((i) => CategoryModel.fromJson(i))
+          .toList();
+
+      return response;
+    }
     return response;
   }
 }

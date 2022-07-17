@@ -14,3 +14,16 @@ class DeleteProduct extends ProductsEvent {
 
   const DeleteProduct(this.id);
 }
+
+class AddProduct extends ProductsEvent {
+  final String name;
+  final String description;
+  final String price;
+  final String code;
+  final String state;
+  final int category;
+  final Function function;
+
+  const AddProduct(this.name, this.description, this.price, this.code,
+      this.state, this.category, this.function);
+}
