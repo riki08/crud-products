@@ -27,3 +27,17 @@ class AddProduct extends ProductsEvent {
   const AddProduct(this.name, this.description, this.price, this.code,
       this.state, this.category, this.function);
 }
+
+class UpdateProduct extends ProductsEvent {
+  final int id;
+  final String name;
+  final String description;
+  final String price;
+  final String code;
+  final String state;
+  final int category;
+  final Function function;
+
+  const UpdateProduct(this.id, this.name, this.description, this.price,
+      this.code, this.state, this.category, this.function);
+}

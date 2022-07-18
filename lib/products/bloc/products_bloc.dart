@@ -16,6 +16,7 @@ class ProductsBloc extends Bloc<ProductsEvent, ProductsState> {
     on<GetProducts>(_onGetProducts);
     on<DeleteProduct>(_onDeleteProduct);
     on<AddProduct>(_onAddProduct);
+    on<UpdateProduct>(_onUpdateProduct);
   }
 
   Future<void> _onGetProducts(
@@ -80,6 +81,34 @@ class ProductsBloc extends Bloc<ProductsEvent, ProductsState> {
     emit(state.copyWith(status: ProductStatus.loading));
     try {
       final apiResult = await _productRepositoryIml.addProduct(
+          event.name,
+          event.description,
+          event.price,
+          event.code,
+          event.state,
+          event.category);
+      if (apiResult.data != null) {
+        event.function();
+      } else {
+        emit(state.copyWith(
+          status: ProductStatus.error,
+          errorMessage: apiResult.message,
+        ));
+      }
+    } catch (e) {
+      emit(state.copyWith(
+        status: ProductStatus.error,
+        errorMessage: e.toString(),
+      ));
+    }
+  }
+
+  Future<void> _onUpdateProduct(
+      UpdateProduct event, Emitter<ProductsState> emit) async {
+    emit(state.copyWith(status: ProductStatus.loading));
+    try {
+      final apiResult = await _productRepositoryIml.updateProduct(
+          event.id,
           event.name,
           event.description,
           event.price,

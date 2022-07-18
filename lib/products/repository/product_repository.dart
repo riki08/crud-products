@@ -78,4 +78,24 @@ class ProductRepository implements ProductRepositoryIml {
     }
     return response;
   }
+
+  @override
+  Future<ApiResponse> updateProduct(int id, String name, String description,
+      String price, String code, String state, int category) async {
+    final response = await _apiBaseHelper.putHttp('productos/$id', {
+      "codigo": code,
+      "estado": state == 'true' ? true : false,
+      "precio": price,
+      "producto": name,
+      "descripcion": description,
+      "idCategoria": category
+    });
+
+    if (response.data != null && response.status == 200) {
+      response.data = ProductModel.fromJson(response.data);
+      print(response);
+      return response;
+    }
+    return response;
+  }
 }

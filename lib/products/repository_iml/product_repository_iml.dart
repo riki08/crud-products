@@ -6,5 +6,7 @@ abstract class ProductRepositoryIml {
   Future<ApiResponse> deleteProduct(int id);
   Future<ApiResponse> addProduct(String name, String description, String price,
       String code, String state, int category);
+  Future<ApiResponse> updateProduct(int id, String name, String description,
+      String price, String code, String state, int category);
   Future<ApiResponse> getCategories();
 }

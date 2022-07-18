@@ -1,11 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:products/products/bloc/products_bloc.dart';
 
+import 'package:products/products/bloc/products_bloc.dart';
+import 'package:products/entities/product.dart';
 import 'package:products/utils/responsive.dart';
 
 class FormPage extends StatefulWidget {
-  const FormPage({super.key});
+  const FormPage({super.key, this.productModel});
+
+  final ProductModel? productModel;
 
   @override
   State<FormPage> createState() => _FormPageState();
@@ -15,10 +18,9 @@ class _FormPageState extends State<FormPage> {
   final productController = TextEditingController();
   final priceController = TextEditingController();
   final descriptionController = TextEditingController();
-  late String? selectedValue;
+  late String? selectedState;
   late int? selectedCategory;
   final codeController = TextEditingController();
-  final categoryController = TextEditingController();
   final _formKey = GlobalKey<FormState>();
   List<DropdownMenuItem<String>> menuItems = const [
     DropdownMenuItem(value: 'true', child: Text("Activo")),
@@ -28,6 +30,14 @@ class _FormPageState extends State<FormPage> {
 
   @override
   void initState() {
+    if (widget.productModel != null) {
+      productController.text = widget.productModel!.producto;
+      priceController.text = widget.productModel!.precio;
+      descriptionController.text = widget.productModel!.descripcion ?? '';
+      codeController.text = widget.productModel!.codigo ?? '';
+      selectedState = widget.productModel!.estado ? 'true' : 'false';
+      selectedCategory = widget.productModel!.idCategoria;
+    }
     super.initState();
   }
 
@@ -36,7 +46,17 @@ class _FormPageState extends State<FormPage> {
     final ProductsBloc _productBloc = BlocProvider.of<ProductsBloc>(context);
     categories = _productBloc.getCategories();
     return Scaffold(
-      appBar: AppBar(title: Text('crear')),
+      appBar: AppBar(
+        title: Text(widget.productModel != null ? 'Actualizar' : 'Crear'),
+        leading: GestureDetector(
+            onTap: () {
+              if (widget.productModel != null) {
+                _productBloc.add(GetProducts());
+              }
+              Navigator.pop(context);
+            },
+            child: Icon(Icons.arrow_back)),
+      ),
       body: Container(
         padding: EdgeInsets.only(right: 1.8.h, left: 1.8.h),
         margin: EdgeInsets.only(top: 6.h),
@@ -166,6 +186,7 @@ class _FormPageState extends State<FormPage> {
                       ),
                       SizedBox(height: 2.h),
                       DropdownButtonFormField(
+                        value: selectedState,
                         hint: Text('Estado del producto'),
                         decoration: InputDecoration(
                             border: OutlineInputBorder(
@@ -176,11 +197,12 @@ class _FormPageState extends State<FormPage> {
                             value == null ? "Campo obligatorio" : null,
                         items: menuItems,
                         onChanged: (String? value) {
-                          selectedValue = value!;
+                          selectedState = value!;
                         },
                       ),
                       SizedBox(height: 2.h),
                       DropdownButtonFormField(
+                        value: selectedCategory,
                         hint: Text('Categoria'),
                         decoration: InputDecoration(
                             border: OutlineInputBorder(
@@ -201,21 +223,36 @@ class _FormPageState extends State<FormPage> {
                         child: ElevatedButton(
                           onPressed: () {
                             if (_formKey.currentState!.validate()) {
-                              _productBloc.add(AddProduct(
-                                  productController.text,
-                                  descriptionController.text,
-                                  priceController.text,
-                                  codeController.text,
-                                  selectedValue!,
-                                  selectedCategory!, () {
-                                print('ir a la pagina de productos');
-                                Navigator.of(context).pop();
-                                _productBloc.add(GetProducts());
-                              }));
+                              if (widget.productModel != null) {
+                                _productBloc.add(UpdateProduct(
+                                    widget.productModel!.id,
+                                    productController.text,
+                                    descriptionController.text,
+                                    priceController.text,
+                                    codeController.text,
+                                    selectedState!,
+                                    selectedCategory!, () {
+                                  Navigator.of(context).pop();
+                                  _productBloc.add(GetProducts());
+                                }));
+                              } else {
+                                _productBloc.add(AddProduct(
+                                    productController.text,
+                                    descriptionController.text,
+                                    priceController.text,
+                                    codeController.text,
+                                    selectedState!,
+                                    selectedCategory!, () {
+                                  Navigator.of(context).pop();
+                                  _productBloc.add(GetProducts());
+                                }));
+                              }
                               FocusScope.of(context).unfocus();
                             }
                           },
-                          child: Text('Crear'),
+                          child: Text(widget.productModel != null
+                              ? 'Actualizar'
+                              : 'Crear'),
                         ),
                       ),
                     ],
